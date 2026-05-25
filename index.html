@@ -680,7 +680,7 @@
       todayLeads.forEach((lead) => {
         const item = document.createElement('li');
         item.className = 'next-actions__item';
-        item.innerHTML = `<strong>${lead.name}</strong> — ${lead.statusLabel.toLowerCase()} (${lead.city}, ${lead.requestedService}).`;
+        item.innerHTML = `<strong>${lead.name}</strong> — reply or follow up now (${lead.city}, ${lead.requestedService}).`;
         nextActionsList.appendChild(item);
       });
     }
