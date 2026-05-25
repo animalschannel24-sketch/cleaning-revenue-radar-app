@@ -718,8 +718,22 @@ if (lead.status === 'contacted') {
   doneButton.type = 'button';
   doneButton.textContent = 'Contacted';
   actions.appendChild(doneButton);
-}
 
+  const bookedButton = document.createElement('button');
+  bookedButton.className = 'action-button';
+  bookedButton.type = 'button';
+  bookedButton.textContent = 'Mark as booked';
+  bookedButton.addEventListener('click', () => {
+    lead.status = 'booked';
+    lead.statusLabel = 'Booked';
+    lead.priority = 'medium';
+    lead.priorityLabel = 'Booked';
+    lead.lastTouch = 'Booked today';
+    renderLeads();
+    updateSummary();
+  });
+  actions.appendChild(bookedButton);
+}
 footer.appendChild(footMeta);
 footer.appendChild(actions);
         card.appendChild(header);
