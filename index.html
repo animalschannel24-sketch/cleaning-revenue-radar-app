@@ -619,25 +619,55 @@
         body.textContent = lead.notes;
 
         const footer = document.createElement('div');
-        footer.className = 'lead-card__footer';
+footer.className = 'lead-card__footer';
 
-        const footMeta = document.createElement('div');
-        footMeta.className = 'lead-card__foot-meta';
+const footMeta = document.createElement('div');
+footMeta.className = 'lead-card__foot-meta';
 
-        const lastTouch = document.createElement('span');
-        lastTouch.textContent = lead.lastTouch;
+const lastTouch = document.createElement('span');
+lastTouch.textContent = lead.lastTouch;
 
-        footMeta.appendChild(lastTouch);
+footMeta.appendChild(lastTouch);
 
-        const priority = document.createElement('div');
-        priority.className = 'lead-card__priority';
-        if (lead.priority === 'high') priority.classList.add('lead-card__priority--high');
-        if (lead.priority === 'medium') priority.classList.add('lead-card__priority--medium');
-        priority.textContent = lead.priorityLabel;
+const actions = document.createElement('div');
+actions.className = 'lead-card__actions';
 
-        footer.appendChild(footMeta);
-        footer.appendChild(priority);
+const priority = document.createElement('div');
+priority.className = 'lead-card__priority';
+if (lead.priority === 'high') priority.classList.add('lead-card__priority--high');
+if (lead.priority === 'medium') priority.classList.add('lead-card__priority--medium');
+priority.textContent = lead.priorityLabel;
 
+actions.appendChild(priority);
+
+if (lead.status !== 'booked' && lead.status !== 'contacted') {
+  const markButton = document.createElement('button');
+  markButton.className = 'action-button';
+  markButton.type = 'button';
+  markButton.textContent = 'Mark as contacted';
+  markButton.addEventListener('click', () => {
+    lead.status = 'contacted';
+    lead.statusLabel = 'Contacted today';
+    lead.statusDot = 'new';
+    lead.priority = 'medium';
+    lead.priorityLabel = 'Medium — waiting for response';
+    lead.lastTouch = 'Contacted today';
+    renderLeads();
+    updateSummary();
+  });
+  actions.appendChild(markButton);
+}
+
+if (lead.status === 'contacted') {
+  const doneButton = document.createElement('button');
+  doneButton.className = 'action-button action-button--done';
+  doneButton.type = 'button';
+  doneButton.textContent = 'Contacted';
+  actions.appendChild(doneButton);
+}
+
+footer.appendChild(footMeta);
+footer.appendChild(actions);
         card.appendChild(header);
         card.appendChild(body);
         card.appendChild(footer);
