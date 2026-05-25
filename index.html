@@ -735,6 +735,14 @@ if (lead.status === 'contacted') {
   });
   actions.appendChild(bookedButton);
 }
+
+        if (lead.status === 'booked') {
+  const reopenButton = document.createElement('button');
+  reopenButton.className = 'action-button';
+  reopenButton.type = 'button';
+  reopenButton.textContent = 'Reopen';
+  actions.appendChild(reopenButton);
+}
 footer.appendChild(footMeta);
 footer.appendChild(actions);
         card.appendChild(header);
