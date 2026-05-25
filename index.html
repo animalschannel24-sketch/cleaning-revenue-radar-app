@@ -687,11 +687,12 @@ footer.appendChild(actions);
 
       const openLeads = leads.filter((lead) => lead.status !== 'booked');
 
-      const todayLeads = leads.filter(
-        (lead) =>
-          lead.status === 'no_reply' ||
-          lead.status === 'followup_due'
-      );
+     const todayLeads = leads.filter(
+  (lead) =>
+    lead.status === 'no_reply' ||
+    lead.status === 'followup_due' ||
+    lead.status === 'quote_sent'
+);
 
       todayCountEl.textContent = todayLeads.length.toString();
       openCountEl.textContent = openLeads.length.toString();
