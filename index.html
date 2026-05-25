@@ -1,12 +1,694 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cleaning Revenue Radar App</title>
+  <meta
+    name="description"
+    content="Minimal MVP app to track unanswered leads and follow-ups for US cleaning businesses."
+  />
+
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec;
+      --color-border: #d4d1ca;
+      --color-divider: #dcd9d5;
+      --color-text: #28251d;
+      --color-text-muted: #6f6c66;
+      --color-text-faint: #a19d96;
+      --color-primary: #01696f;
+      --color-primary-soft: #cedcd8;
+      --color-warning: #964219;
+      --color-success: #437a22;
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+
+      --shadow-sm: 0 1px 2px rgba(20, 20, 20, 0.06);
+      --shadow-md: 0 10px 30px rgba(20, 20, 20, 0.08);
+
+      --content-default: 1120px;
+      --transition-interactive: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      text-size-adjust: none;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-body, 'Satoshi', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      color: var(--color-text);
+      background:
+        radial-gradient(circle at top right, rgba(1, 105, 111, 0.08), transparent 30%),
+        var(--color-bg);
+      padding: var(--space-6) var(--space-4);
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    p {
+      text-wrap: pretty;
+      max-width: 70ch;
+    }
+
+    .app-shell {
+      max-width: var(--content-default);
+      margin: 0 auto;
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    .app-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .app-header__title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      justify-content: space-between;
+    }
+
+    .app-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .app-title h1 {
+      font-size: var(--text-xl);
+      letter-spacing: -0.02em;
+    }
+
+    .app-title span {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .app-header__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid rgba(40, 37, 29, 0.12);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+    }
+
+    .pill--highlight {
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      border-color: rgba(1, 105, 111, 0.3);
+    }
+
+    .pill__dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      background: var(--color-success);
+    }
+
+    .app-layout {
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    @media (min-width: 960px) {
+      .app-layout {
+        grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+        align-items: flex-start;
+      }
+    }
+
+    .panel {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(40, 37, 29, 0.12);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-5);
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .panel__header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .panel__title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .panel__title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+    }
+
+    .panel__subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .panel__meta {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .lead-list {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .lead-card {
+      background: var(--color-surface-2);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(40, 37, 29, 0.12);
+      padding: var(--space-4);
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .lead-card__header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .lead-card__name {
+      font-weight: 600;
+      font-size: var(--text-sm);
+    }
+
+    .lead-card__meta {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .lead-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: var(--text-xs);
+      border: 1px solid rgba(40, 37, 29, 0.12);
+      background: var(--color-surface);
+    }
+
+    .tag--status {
+      border-color: rgba(1, 105, 111, 0.32);
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+
+    .tag__dot {
+      width: 0.38rem;
+      height: 0.38rem;
+      border-radius: 999px;
+    }
+
+    .tag__dot--new {
+      background: var(--color-primary);
+    }
+
+    .tag__dot--quote {
+      background: #d19900;
+    }
+
+    .tag__dot--followup {
+      background: var(--color-warning);
+    }
+
+    .lead-card__body {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .lead-card__footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lead-card__foot-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .lead-card__priority {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: var(--color-surface-offset);
+      border: 1px solid rgba(40, 37, 29, 0.12);
+    }
+
+    .lead-card__priority--high {
+      border-color: rgba(150, 66, 25, 0.5);
+      color: var(--color-warning);
+    }
+
+    .lead-card__priority--medium {
+      border-color: rgba(1, 105, 111, 0.35);
+      color: var(--color-primary);
+    }
+
+    .summary {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .summary-row__label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .summary-row__value {
+      font-size: var(--text-base);
+      font-weight: 700;
+    }
+
+    .summary-row__value--highlight {
+      color: var(--color-warning);
+    }
+
+    .summary-row__note {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: var(--color-divider);
+      margin-block: var(--space-2);
+    }
+
+    .next-actions {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .next-actions__list {
+      list-style: none;
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .next-actions__item {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .next-actions__item strong {
+      color: var(--color-text);
+    }
+
+    .note {
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+    }
+
+    @media (max-width: 599px) {
+      body {
+        padding-inline: var(--space-3);
+      }
+
+      .panel {
+        padding: var(--space-4);
+      }
+
+      .lead-card {
+        padding: var(--space-3);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Cleaning Revenue Radar App</h1>
-  <p>MVP in progress.</p>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header__title-row">
+        <div class="app-title">
+          <h1>Cleaning Revenue Radar</h1>
+          <span>MVP — focus only on unanswered leads and follow-ups</span>
+        </div>
+        <div class="app-header__meta">
+          <div class="pill pill--highlight">
+            <span class="pill__dot"></span>
+            <span>Today’s radar</span>
+          </div>
+          <div class="pill">
+            <span>Early access — internal use only</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <section class="panel" aria-label="Lead board">
+        <header class="panel__header">
+          <div class="panel__title-group">
+            <h2 class="panel__title">Lead board</h2>
+            <p class="panel__subtitle">Minimal view of who is waiting on you now.</p>
+          </div>
+          <div class="panel__meta">
+            <span id="lead-count">0 leads</span>
+          </div>
+        </header>
+
+        <div class="lead-list" id="lead-list">
+          <!-- Lead cards são inseridos via JavaScript -->
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="Today’s follow-up summary">
+        <header class="panel__header">
+          <div class="panel__title-group">
+            <h2 class="panel__title">Today’s follow-up radar</h2>
+            <p class="panel__subtitle">Who needs a reply, quote, or follow-up today.</p>
+          </div>
+        </header>
+
+        <div class="summary">
+          <div class="summary-row">
+            <div>
+              <div class="summary-row__label">Leads needing action today</div>
+              <div class="summary-row__note">Any lead with status “follow-up due” or “no reply yet”.</div>
+            </div>
+            <div class="summary-row__value summary-row__value--highlight" id="today-count">0</div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row">
+            <div>
+              <div class="summary-row__label">Total open leads</div>
+              <div class="summary-row__note">All leads not yet marked as booked.</div>
+            </div>
+            <div class="summary-row__value" id="open-count">0</div>
+          </div>
+        </div>
+
+        <div class="next-actions">
+          <h3>Next actions</h3>
+          <ul class="next-actions__list" id="next-actions-list">
+            <!-- Lista de ações de hoje é construída via JavaScript -->
+          </ul>
+        </div>
+
+        <p class="note">
+          This MVP is fully manual on purpose. The goal is to make follow-up more consistent before
+          connecting to any external tools.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const leads = [
+      {
+        id: 1,
+        name: 'Sarah Miller',
+        city: 'Austin, TX',
+        requestedService: 'Bi-weekly residential cleaning',
+        source: 'Google Ads',
+        status: 'no_reply',
+        statusLabel: 'No reply yet',
+        statusDot: 'new',
+        priority: 'high',
+        priorityLabel: 'High — reply today',
+        lastTouch: 'New inquiry today 09:15',
+        notes: 'Asked for quote for 3-bedroom house. Mentioned flexible schedule during weekdays.',
+      },
+      {
+        id: 2,
+        name: 'James Parker',
+        city: 'Denver, CO',
+        requestedService: 'Move-out cleaning',
+        source: 'Referral',
+        status: 'quote_sent',
+        statusLabel: 'Quote sent — no answer',
+        statusDot: 'quote',
+        priority: 'medium',
+        priorityLabel: 'Medium — follow up in 1–2 days',
+        lastTouch: 'Quote sent yesterday 16:40',
+        notes: 'Needs cleaning before next Friday. Price sent with minor discount for weekday slot.',
+      },
+      {
+        id: 3,
+        name: 'Gloria Ramirez',
+        city: 'Phoenix, AZ',
+        requestedService: 'Deep cleaning',
+        source: 'Website form',
+        status: 'followup_due',
+        statusLabel: 'Follow-up due',
+        statusDot: 'followup',
+        priority: 'high',
+        priorityLabel: 'High — follow up today',
+        lastTouch: 'Asked for second quote 3 days ago',
+        notes: 'Mentioned another company quote. Waiting for your updated proposal.',
+      },
+      {
+        id: 4,
+        name: 'Brown Family',
+        city: 'Seattle, WA',
+        requestedService: 'Weekly cleaning',
+        source: 'Google Business Profile',
+        status: 'booked',
+        statusLabel: 'Booked',
+        statusDot: 'quote',
+        priority: 'medium',
+        priorityLabel: 'Booked — no action needed',
+        lastTouch: 'Start date confirmed for next Monday',
+        notes: 'New recurring client. Keep for reference but no follow-up needed.',
+      },
+    ];
+
+    function renderLeads() {
+      const list = document.getElementById('lead-list');
+      const leadCountLabel = document.getElementById('lead-count');
+      if (!list || !leadCountLabel) return;
+
+      list.innerHTML = '';
+
+      leads.forEach((lead) => {
+        const card = document.createElement('article');
+        card.className = 'lead-card';
+
+        const header = document.createElement('div');
+        header.className = 'lead-card__header';
+
+        const headerLeft = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'lead-card__name';
+        name.textContent = lead.name;
+
+        const meta = document.createElement('div');
+        meta.className = 'lead-card__meta';
+        meta.textContent = `${lead.city} · ${lead.requestedService}`;
+
+        headerLeft.appendChild(name);
+        headerLeft.appendChild(meta);
+
+        const tags = document.createElement('div');
+        tags.className = 'lead-card__tags';
+
+        const statusTag = document.createElement('div');
+        statusTag.className = 'tag tag--status';
+
+        const statusDot = document.createElement('span');
+        statusDot.className = 'tag__dot';
+        if (lead.statusDot === 'new') statusDot.classList.add('tag__dot--new');
+        if (lead.statusDot === 'quote') statusDot.classList.add('tag__dot--quote');
+        if (lead.statusDot === 'followup') statusDot.classList.add('tag__dot--followup');
+
+        const statusText = document.createElement('span');
+        statusText.textContent = lead.statusLabel;
+
+        statusTag.appendChild(statusDot);
+        statusTag.appendChild(statusText);
+        tags.appendChild(statusTag);
+
+        const sourceTag = document.createElement('div');
+        sourceTag.className = 'tag';
+        sourceTag.textContent = lead.source;
+        tags.appendChild(sourceTag);
+
+        header.appendChild(headerLeft);
+        header.appendChild(tags);
+
+        const body = document.createElement('p');
+        body.className = 'lead-card__body';
+        body.textContent = lead.notes;
+
+        const footer = document.createElement('div');
+        footer.className = 'lead-card__footer';
+
+        const footMeta = document.createElement('div');
+        footMeta.className = 'lead-card__foot-meta';
+
+        const lastTouch = document.createElement('span');
+        lastTouch.textContent = lead.lastTouch;
+
+        footMeta.appendChild(lastTouch);
+
+        const priority = document.createElement('div');
+        priority.className = 'lead-card__priority';
+        if (lead.priority === 'high') priority.classList.add('lead-card__priority--high');
+        if (lead.priority === 'medium') priority.classList.add('lead-card__priority--medium');
+        priority.textContent = lead.priorityLabel;
+
+        footer.appendChild(footMeta);
+        footer.appendChild(priority);
+
+        card.appendChild(header);
+        card.appendChild(body);
+        card.appendChild(footer);
+
+        list.appendChild(card);
+      });
+
+      leadCountLabel.textContent = `${leads.length} lead${leads.length === 1 ? '' : 's'}`;
+    }
+
+    function updateSummary() {
+      const todayCountEl = document.getElementById('today-count');
+      const openCountEl = document.getElementById('open-count');
+      const nextActionsList = document.getElementById('next-actions-list');
+
+      if (!todayCountEl || !openCountEl || !nextActionsList) return;
+
+      const openLeads = leads.filter((lead) => lead.status !== 'booked');
+
+      const todayLeads = leads.filter(
+        (lead) =>
+          lead.status === 'no_reply' ||
+          lead.status === 'followup_due'
+      );
+
+      todayCountEl.textContent = todayLeads.length.toString();
+      openCountEl.textContent = openLeads.length.toString();
+
+      nextActionsList.innerHTML = '';
+
+      if (todayLeads.length === 0) {
+        const item = document.createElement('li');
+        item.className = 'next-actions__item';
+        item.textContent = 'No leads need action today. Review yesterday’s quotes or new inquiries.';
+        nextActionsList.appendChild(item);
+        return;
+      }
+
+      todayLeads.forEach((lead) => {
+        const item = document.createElement('li');
+        item.className = 'next-actions__item';
+        item.innerHTML = `<strong>${lead.name}</strong> — ${lead.statusLabel.toLowerCase()} (${lead.city}, ${lead.requestedService}).`;
+        nextActionsList.appendChild(item);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderLeads();
+      updateSummary();
+    });
+  </script>
 </body>
 </html>
