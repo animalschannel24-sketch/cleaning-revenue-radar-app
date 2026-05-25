@@ -726,8 +726,8 @@ if (lead.status === 'contacted') {
   bookedButton.addEventListener('click', () => {
     lead.status = 'booked';
     lead.statusLabel = 'Booked';
-    lead.priority = 'medium';
-    lead.priorityLabel = 'Booked';
+    lead.priority = 'booked';
+    lead.priorityLabel = 'Booked — no action needed';
     lead.lastTouch = 'Booked today';
     renderLeads();
     updateSummary();
