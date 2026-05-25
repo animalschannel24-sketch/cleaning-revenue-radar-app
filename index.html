@@ -723,7 +723,7 @@ if (lead.status === 'contacted') {
   const bookedButton = document.createElement('button');
   bookedButton.className = 'action-button';
   bookedButton.type = 'button';
-  bookedButton.textContent = 'Mark as booked';
+  bookedButton.textContent = 'Book';
   bookedButton.addEventListener('click', () => {
     lead.status = 'booked';
     lead.statusLabel = 'Booked';
